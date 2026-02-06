@@ -1,0 +1,32 @@
+[package]
+name = "spider-lib"
+version = "0.5.1"
+edition = "2024"
+authors = ["mzyui <mzyui@proton.me>"]
+description = "A Rust-based web scraping framework inspired by Scrapy (Python)."
+homepage = "https://github.com/spider-lib/spider-lib"
+repository = "https://github.com/spider-lib/spider-lib"
+license = "MIT"
+readme = "README.md"
+keywords = ["web-scraping", "crawler", "scraper", "async", "rust"]
+categories = ["web-programming", "development-tools", "parsing"]
+
+[workspace]
+members = [
+    "spider-core",
+    "spider-macro",
+    "spider-middlewares",
+    "spider-pipelines",
+]
+
+[dependencies]
+dashmap = { version = "5.4", features = ["serde"] }
+spider-macro = "0.1.2"
+spider-core = { path = "./spider-core" }
+spider-middlewares = { path = "./spider-middlewares" }
+spider-pipelines = { path = "./spider-pipelines" }
+tokio = { version = "1.0", features = ["full"] }
+
+
+
+[dev-dependencies]
