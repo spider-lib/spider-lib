@@ -23,15 +23,14 @@ members = [
 ]
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+serde = { version = "1.0.228", features = ["derive"] }
 
-spider-util = "0.1.1"
-spider-macro = "0.1.3"
-spider-downloader = "0.1.2"
-spider-middleware = "0.1.2"
-spider-core = "0.1.1"
-spider-pipeline = "0.1.3"
+spider-util = { version = "0.1.1", path = "spider-util" }
+spider-macro = { version = "0.1.3", path = "spider-macro" }
+spider-middleware = { version = "0.1.2", path = "spider-middleware" }
+spider-core = { version = "0.1.2", path = "spider-core" }
+spider-pipeline = { version = "0.1.3", path = "spider-pipeline" }
+spider-downloader = { version = "0.1.2", path = "spider-downloader" }
 
 [dev-dependencies]
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
