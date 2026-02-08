@@ -101,12 +101,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Documentation
 
 For more detailed documentation, visit [https://docs.rs/spider-lib](https://docs.rs/spider-lib)
-
-## Related Projects
-
-- [spider-lib GitHub Repository](https://github.com/spider-lib/spider-lib)
-- [Documentation](https://docs.rs/spider-lib)
-
-## Keywords
-
-web-scraping, crawler, scraper, async, rust
