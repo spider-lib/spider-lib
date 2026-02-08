@@ -44,10 +44,23 @@ pub use spider_util::{
 };
 
 pub use spider_middleware::{
-    cookies::CookieMiddleware, http_cache::HttpCacheMiddleware, proxy::ProxyMiddleware,
     rate_limit::RateLimitMiddleware, referer::RefererMiddleware, retry::RetryMiddleware,
-    robots_txt::RobotsTxtMiddleware, user_agent::UserAgentMiddleware,
 };
+
+#[cfg(feature = "middleware-cache")]
+pub use spider_middleware::http_cache::HttpCacheMiddleware;
+
+#[cfg(feature = "middleware-proxy")]
+pub use spider_middleware::proxy::ProxyMiddleware;
+
+#[cfg(feature = "middleware-user-agent")]
+pub use spider_middleware::user_agent::UserAgentMiddleware;
+
+#[cfg(feature = "middleware-robots")]
+pub use spider_middleware::robots_txt::RobotsTxtMiddleware;
+
+#[cfg(feature = "middleware-cookies")]
+pub use spider_middleware::cookies::CookieMiddleware;
 
 pub use spider_pipeline::{
     console_writer::ConsoleWriterPipeline, csv_exporter::CsvExporterPipeline,
