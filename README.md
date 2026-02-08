@@ -52,6 +52,46 @@ Add this to your `Cargo.toml`:
 spider-lib = "0.5.1"
 ```
 
+### Features
+
+Spider-lib provides optional features for specific functionality:
+
+#### Middleware Features
+- `middleware-cache` - Enable HTTP caching capabilities for development
+- `middleware-proxy` - Enable proxy rotation functionality
+- `middleware-user-agent` - Enable user-agent rotation
+- `middleware-robots` - Enable robots.txt compliance checking
+- `middleware-cookies` - Enable cookie management
+
+#### Pipeline Features
+- `pipeline-csv` - Enable CSV export functionality
+- `pipeline-json` - Enable JSON writing functionality
+- `pipeline-jsonl` - Enable JSONL writing functionality
+- `pipeline-sqlite` - Enable SQLite database functionality
+- `pipeline-streaming-json` - Enable streaming JSON functionality
+
+#### Core Features
+- `checkpoint` - Enable checkpoint and resume functionality
+- `cookie-store` - Enable advanced cookie store integration (Note: When using `middleware-cookies`, `cookie-store` should also be enabled)
+
+#### Important Feature Relationships
+- `middleware-cookies` and `cookie-store` are interdependent: When using `middleware-cookies`, `cookie-store` should also be enabled for full functionality
+- When using `cookie-store`, `middleware-cookies` functionality may be desired for managing cookies effectively
+
+By default, only core functionality is included. You can enable specific features as needed:
+
+```toml
+[dependencies]
+spider-lib = { version = "0.5.1", features = ["middleware-cache", "pipeline-csv"] }
+```
+
+Or disable default features and enable only what you need:
+
+```toml
+[dependencies]
+spider-lib = { version = "0.5.1", default-features = false, features = ["core"] }
+```
+
 ## Usage
 
 Here's a basic example of how to use the framework:

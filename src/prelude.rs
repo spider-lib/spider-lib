@@ -63,8 +63,24 @@ pub use spider_middleware::robots_txt::RobotsTxtMiddleware;
 pub use spider_middleware::cookies::CookieMiddleware;
 
 pub use spider_pipeline::{
-    console_writer::ConsoleWriterPipeline, csv_exporter::CsvExporterPipeline,
-    deduplication::DeduplicationPipeline, json_writer::JsonWriterPipeline,
-    jsonl_writer::JsonlWriterPipeline, sqlite_writer::SqliteWriterPipeline,
-    streaming_json_writer::StreamingJsonWriterPipeline,
+    console_writer::ConsoleWriterPipeline,
+    deduplication::DeduplicationPipeline,
 };
+
+#[cfg(feature = "pipeline-csv")]
+pub use spider_pipeline::csv_exporter::CsvExporterPipeline;
+
+#[cfg(feature = "pipeline-json")]
+pub use spider_pipeline::json_writer::JsonWriterPipeline;
+
+#[cfg(feature = "pipeline-jsonl")]
+pub use spider_pipeline::jsonl_writer::JsonlWriterPipeline;
+
+#[cfg(feature = "pipeline-sqlite")]
+pub use spider_pipeline::sqlite_writer::SqliteWriterPipeline;
+
+#[cfg(feature = "pipeline-streaming-json")]
+pub use spider_pipeline::streaming_json_writer::StreamingJsonWriterPipeline;
+
+#[cfg(feature = "checkpoint")]
+pub use spider_core::checkpoint::{Checkpoint, SchedulerCheckpoint};

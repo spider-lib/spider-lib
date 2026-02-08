@@ -2294,7 +2294,7 @@ dependencies = [
 
 [[package]]
 name = "spider-core"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2334,9 +2334,10 @@ dependencies = [
 
 [[package]]
 name = "spider-lib"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "serde",
+ "serde_json",
  "spider-core",
  "spider-downloader",
  "spider-macro 0.1.3",
@@ -2367,7 +2368,7 @@ dependencies = [
 
 [[package]]
 name = "spider-middleware"
-version = "0.1.2"
+version = "0.1.4"
 dependencies = [
  "async-trait",
  "bincode",
@@ -2397,7 +2398,7 @@ dependencies = [
 
 [[package]]
 name = "spider-pipeline"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "async-trait",
  "csv",
