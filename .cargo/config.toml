@@ -1,0 +1,14 @@
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+lto = true
+codegen-units = 1
+
+[build]
+# Sesuaikan jumlah job sesuai core CPU Anda
+jobs = 4
+rustflags = ["-C", "target-cpu=native"]

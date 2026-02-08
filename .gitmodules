@@ -10,3 +10,6 @@
 [submodule "spider-pipeline"]
 	path = spider-pipeline
 	url = https://github.com/spider-lib/spider-pipeline
+[submodule "spider-downloader"]
+	path = spider-downloader
+	url = https://github.com/spider-lib/spider-downloader

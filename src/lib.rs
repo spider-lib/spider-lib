@@ -76,6 +76,4 @@
 //! ```
 
 pub mod prelude;
-
-// Re-export everything from sub-crates through the prelude
 pub use prelude::*;
