@@ -1,3 +1,6 @@
+[submodule "spider-core"]
+	path = spider-core
+	url = https://github.com/spider-lib/spider-core
 [submodule "spider-macro"]
 	path = spider-macro
 	url = https://github.com/spider-lib/spider-macro
