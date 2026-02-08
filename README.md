@@ -49,8 +49,12 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-spider-lib = "0.5.1"
+spider-lib = "1.1.1"
+serde = { version = "1.0", features = ["derive"] }  # Required for #[scraped_item] macro
+serde_json = "1.0"  # Required for #[scraped_item] macro
 ```
+
+**Note**: When using the `#[scraped_item]` macro, you must also include `serde` and `serde_json` as direct dependencies in your project, as the macro generates code that references these crates directly.
 
 ### Features
 
@@ -97,19 +101,18 @@ spider-lib = { version = "0.5.1", default-features = false, features = ["core"] 
 Here's a basic example of how to use the framework:
 
 ```rust
-use spider_lib::{Crawler, CrawlerBuilder, Spider, SpiderError};
 use spider_lib::prelude::*;
 
 #[derive(Default)]
 struct MySpider;
 
-#[spider_macro::scraped_item]
+#[scraped_item]
 struct MyItem {
     title: String,
     url: String,
 }
 
-#[async_trait::async_trait]
+#[async_trait]
 impl Spider for MySpider {
     type Item = MyItem;
 
@@ -129,6 +132,8 @@ async fn main() -> Result<(), SpiderError> {
     crawler.start_crawl().await
 }
 ```
+
+**Important**: Make sure to import the prelude with `use spider_lib::prelude::*;` to bring the necessary items into scope for the macro to work properly.
 
 ## Contributing
 
