@@ -4,3 +4,9 @@
 [submodule "spider-util"]
 	path = spider-util
 	url = https://github.com/spider-lib/spider-util
+[submodule "spider-middleware"]
+	path = spider-middleware
+	url = https://github.com/spider-lib/spider-middleware
+[submodule "spider-pipeline"]
+	path = spider-pipeline
+	url = https://github.com/spider-lib/spider-pipeline
