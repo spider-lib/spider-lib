@@ -72,17 +72,17 @@ Spider-lib provides optional features for specific functionality:
 - `pipeline-json` - Enable JSON writing functionality
 - `pipeline-jsonl` - Enable JSONL writing functionality
 - `pipeline-sqlite` - Enable SQLite database functionality
-- `pipeline-streaming-json` - Enable streaming JSON functionality
+- `pipeline-stream-json` - Enable stream JSON functionality
 
 #### Core Features
 - `checkpoint` - Enable checkpoint and resume functionality
 - `cookie-store` - Enable advanced cookie store integration (Note: When using `middleware-cookies`, `cookie-store` should also be enabled)
-- `streaming` - Enable streaming response processing for memory-efficient handling of large responses
+- `stream` - Enable stream response processing for memory-efficient handling of large responses
 
 #### Important Feature Relationships
 - `middleware-cookies` and `cookie-store` are interdependent: When using `middleware-cookies`, `cookie-store` should also be enabled for full functionality
 - When using `cookie-store`, `middleware-cookies` functionality may be desired for managing cookies effectively
-- `streaming` feature enables memory-efficient processing of large responses without loading entire body into memory
+- `stream` feature enables memory-efficient processing of large responses without loading entire body into memory
 
 By default, only core functionality is included. You can enable specific features as needed:
 
@@ -145,18 +145,18 @@ We welcome contributions to the spider-lib project! Please see our [CONTRIBUTING
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Streaming Response Feature
+## Stream Response Feature
 
-The `streaming` feature enables memory-efficient processing of large responses without loading the entire body into memory at once. This is particularly useful when scraping large web pages or when memory usage is a concern.
+The `stream` feature enables memory-efficient processing of large responses without loading the entire body into memory at once. This is particularly useful when scraping large web pages or when memory usage is a concern.
 
-To use the streaming feature:
+To use the stream feature:
 
 ```toml
 [dependencies]
-spider-lib = { version = "1.1.1", features = ["streaming"] }
+spider-lib = { version = "1.2.0", features = ["stream"] }
 ```
 
-With the streaming feature enabled, you can implement both `parse` and `parse_streaming` methods in your spider:
+With the stream feature enabled, you can implement both `parse` and `parse_stream` methods in your spider:
 
 ```rust
 use spider_lib::prelude::*;
@@ -182,10 +182,10 @@ impl Spider for MySpider {
         todo!()
     }
 
-    #[cfg(feature = "streaming")]
-    async fn parse_streaming(&mut self, response: StreamingResponse) -> Result<ParseOutput<Self::Item>, SpiderError> {
-        // Streaming parsing - processes response without loading entire body
-        // ... streaming parsing logic ...
+    #[cfg(feature = "stream")]
+    async fn parse_stream(&mut self, response: StreamResponse) -> Result<ParseOutput<Self::Item>, SpiderError> {
+        // Stream parsing - processes response without loading entire body
+        // ... stream parsing logic ...
         todo!()
     }
 }

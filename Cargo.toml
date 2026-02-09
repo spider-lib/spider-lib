@@ -1,6 +1,6 @@
 [package]
 name = "spider-lib"
-version = "1.1.3"
+version = "1.2.0"
 edition = "2024"
 authors = ["mzyui <mzyui@proton.me>"]
 description = "A Rust-based web scraping framework inspired by Scrapy (Python)."
@@ -26,12 +26,12 @@ members = [
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 
-spider-util = { version = "0.1.2", path = "spider-util" }
-spider-macro = { version = "0.1.4", path = "spider-macro" }
-spider-middleware = { version = "0.1.6", path = "spider-middleware", features = ["core"] }
-spider-core = { version = "0.1.7", path = "spider-core" }
-spider-pipeline = { version = "0.1.6", path = "spider-pipeline" }
-spider-downloader = { version = "0.1.3", path = "spider-downloader" }
+spider-util = { version = "0.1.3", path = "spider-util" }
+spider-macro = { version = "0.1.5", path = "spider-macro" }
+spider-middleware = { version = "0.1.7", path = "spider-middleware", features = ["core"] }
+spider-core = { version = "0.1.8", path = "spider-core" }
+spider-pipeline = { version = "0.1.7", path = "spider-pipeline" }
+spider-downloader = { version = "0.1.4", path = "spider-downloader" }
 
 [features]
 default = ["core"]
@@ -47,12 +47,12 @@ pipeline-csv = ["spider-pipeline/pipeline-csv"]
 pipeline-json = ["spider-pipeline/pipeline-json"]
 pipeline-jsonl = ["spider-pipeline/pipeline-jsonl"]
 pipeline-sqlite = ["spider-pipeline/pipeline-sqlite"]
-pipeline-streaming-json = ["spider-pipeline/pipeline-streaming-json"]
+pipeline-stream-json = ["spider-pipeline/pipeline-stream-json"]
 
 checkpoint = ["spider-core/checkpoint"]
 cookie-store = ["spider-core/cookie-store", "middleware-cookies"]
 
-streaming = ["spider-util/streaming", "spider-downloader/streaming", "spider-core/streaming"]
+stream = ["spider-util/stream", "spider-downloader/stream", "spider-core/stream"]
 
 # Note: middleware-cookies and cookie-store are interdependent features
 # When using middleware-cookies, cookie-store should also be enabled
@@ -63,9 +63,9 @@ name = "quotes"
 path = "examples/quotes.rs"
 
 [[example]]
-name = "streaming"
-path = "examples/streaming.rs"
-required-features = ["streaming"]
+name = "quotes_stream"
+path = "examples/quotes_stream.rs"
+required-features = ["stream"]
 
 [dev-dependencies]
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }

@@ -29,7 +29,8 @@ pub use spider_core::{
 // Re-export ParseOutput and ScrapedItem from spider_util
 pub use spider_util::{
     item::{ParseOutput, ScrapedItem},
-    streaming_response::StreamingResponse,
+    response_type::ResponseType,
+    stream_response::StreamResponse,
 };
 
 // Re-export Pipeline from spider_pipeline
@@ -80,8 +81,8 @@ pub use spider_pipeline::jsonl_writer::JsonlWriterPipeline;
 #[cfg(feature = "pipeline-sqlite")]
 pub use spider_pipeline::sqlite_writer::SqliteWriterPipeline;
 
-#[cfg(feature = "pipeline-streaming-json")]
-pub use spider_pipeline::streaming_json_writer::StreamingJsonWriterPipeline;
+#[cfg(feature = "pipeline-stream-json")]
+pub use spider_pipeline::stream_json_writer::StreamJsonWriterPipeline;
 
 #[cfg(feature = "checkpoint")]
 pub use spider_core::checkpoint::{Checkpoint, SchedulerCheckpoint};
