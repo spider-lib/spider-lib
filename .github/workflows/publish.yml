@@ -7,6 +7,7 @@ on:
     paths:
       - 'Cargo.toml'
       - 'spider-*/Cargo.toml'
+  workflow_dispatch:
 
 jobs:
   check-version-changes:
@@ -24,17 +25,26 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
       - name: Check main version changes
         id: main_check
         run: |
-          CURRENT_VERSION=$(grep -oP '^version = "\K[^"]*' Cargo.toml)
-          PREVIOUS_VERSION=$(git show HEAD~1:Cargo.toml | grep -oP '^version = "\K[^"]*')
+          LOCAL_VERSION=$(grep -oP '^version = "\K[^"]*' Cargo.toml)
           
-          if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
-            echo "Main version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+          # Get the version from crates.io
+          if curl -s https://crates.io/api/v1/crates/spider-lib | python3 -c "import sys, json; print(json.load(sys.stdin)['crate']['max_version'] if 'crate' in json.load(sys.stdin) else '0.0.0')" 2>/dev/null; then
+            CRATES_IO_VERSION=$(curl -s https://crates.io/api/v1/crates/spider-lib | python3 -c "import sys, json; print(json.load(sys.stdin)['crate']['max_version'])" 2>/dev/null || echo "0.0.0")
+          else
+            CRATES_IO_VERSION="0.0.0"
+          fi
+          
+          if [ "$LOCAL_VERSION" != "$CRATES_IO_VERSION" ]; then
+            echo "Main version differs from crates.io: local=$LOCAL_VERSION, crates.io=$CRATES_IO_VERSION"
             echo "changed=true" >> $GITHUB_OUTPUT
           else
-            echo "Main version did not change"
+            echo "Main version matches crates.io: $LOCAL_VERSION"
             echo "changed=false" >> $GITHUB_OUTPUT
           fi
 
@@ -42,14 +52,20 @@ jobs:
         id: util_check
         run: |
           if [ -f "spider-util/Cargo.toml" ]; then
-            CURRENT_VERSION=$(grep -oP '^version = "\K[^"]*' spider-util/Cargo.toml)
-            PREVIOUS_VERSION=$(git show HEAD~1:spider-util/Cargo.toml | grep -oP '^version = "\K[^"]*')
+            LOCAL_VERSION=$(grep -oP '^version = "\K[^"]*' spider-util/Cargo.toml)
             
-            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
-              echo "spider-util version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+            # Get the version from crates.io
+            if curl -s https://crates.io/api/v1/crates/spider-util | python3 -c "import sys, json; print(json.load(sys.stdin)['crate']['max_version'] if 'crate' in json.load(sys.stdin) else '0.0.0')" 2>/dev/null; then
+              CRATES_IO_VERSION=$(curl -s https://crates.io/api/v1/crates/spider-util | python3 -c "import sys, json; print(json.load(sys.stdin)['crate']['max_version'])" 2>/dev/null || echo "0.0.0")
+            else
+              CRATES_IO_VERSION="0.0.0"
+            fi
+            
+            if [ "$LOCAL_VERSION" != "$CRATES_IO_VERSION" ]; then
+              echo "spider-util version differs from crates.io: local=$LOCAL_VERSION, crates.io=$CRATES_IO_VERSION"
               echo "changed=true" >> $GITHUB_OUTPUT
             else
-              echo "spider-util version did not change"
+              echo "spider-util version matches crates.io: $LOCAL_VERSION"
               echo "changed=false" >> $GITHUB_OUTPUT
             fi
           else
@@ -61,14 +77,20 @@ jobs:
         id: macro_check
         run: |
           if [ -f "spider-macro/Cargo.toml" ]; then
-            CURRENT_VERSION=$(grep -oP '^version = "\K[^"]*' spider-macro/Cargo.toml)
-            PREVIOUS_VERSION=$(git show HEAD~1:spider-macro/Cargo.toml | grep -oP '^version = "\K[^"]*')
+            LOCAL_VERSION=$(grep -oP '^version = "\K[^"]*' spider-macro/Cargo.toml)
             
-            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
-              echo "spider-macro version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+            # Get the version from crates.io
+            if curl -s https://crates.io/api/v1/crates/spider-macro | python3 -c "import sys, json; print(json.load(sys.stdin)['crate']['max_version'] if 'crate' in json.load(sys.stdin) else '0.0.0')" 2>/dev/null; then
+              CRATES_IO_VERSION=$(curl -s https://crates.io/api/v1/crates/spider-macro | python3 -c "import sys, json; print(json.load(sys.stdin)['crate']['max_version'])" 2>/dev/null || echo "0.0.0")
+            else
+              CRATES_IO_VERSION="0.0.0"
+            fi
+            
+            if [ "$LOCAL_VERSION" != "$CRATES_IO_VERSION" ]; then
+              echo "spider-macro version differs from crates.io: local=$LOCAL_VERSION, crates.io=$CRATES_IO_VERSION"
               echo "changed=true" >> $GITHUB_OUTPUT
             else
-              echo "spider-macro version did not change"
+              echo "spider-macro version matches crates.io: $LOCAL_VERSION"
               echo "changed=false" >> $GITHUB_OUTPUT
             fi
           else
@@ -80,14 +102,20 @@ jobs:
         id: downloader_check
         run: |
           if [ -f "spider-downloader/Cargo.toml" ]; then
-            CURRENT_VERSION=$(grep -oP '^version = "\K[^"]*' spider-downloader/Cargo.toml)
-            PREVIOUS_VERSION=$(git show HEAD~1:spider-downloader/Cargo.toml | grep -oP '^version = "\K[^"]*')
+            LOCAL_VERSION=$(grep -oP '^version = "\K[^"]*' spider-downloader/Cargo.toml)
             
-            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
-              echo "spider-downloader version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+            # Get the version from crates.io
+            if curl -s https://crates.io/api/v1/crates/spider-downloader | python3 -c "import sys, json; print(json.load(sys.stdin)['crate']['max_version'] if 'crate' in json.load(sys.stdin) else '0.0.0')" 2>/dev/null; then
+              CRATES_IO_VERSION=$(curl -s https://crates.io/api/v1/crates/spider-downloader | python3 -c "import sys, json; print(json.load(sys.stdin)['crate']['max_version'])" 2>/dev/null || echo "0.0.0")
+            else
+              CRATES_IO_VERSION="0.0.0"
+            fi
+            
+            if [ "$LOCAL_VERSION" != "$CRATES_IO_VERSION" ]; then
+              echo "spider-downloader version differs from crates.io: local=$LOCAL_VERSION, crates.io=$CRATES_IO_VERSION"
               echo "changed=true" >> $GITHUB_OUTPUT
             else
-              echo "spider-downloader version did not change"
+              echo "spider-downloader version matches crates.io: $LOCAL_VERSION"
               echo "changed=false" >> $GITHUB_OUTPUT
             fi
           else
@@ -99,14 +127,20 @@ jobs:
         id: pipeline_check
         run: |
           if [ -f "spider-pipeline/Cargo.toml" ]; then
-            CURRENT_VERSION=$(grep -oP '^version = "\K[^"]*' spider-pipeline/Cargo.toml)
-            PREVIOUS_VERSION=$(git show HEAD~1:spider-pipeline/Cargo.toml | grep -oP '^version = "\K[^"]*')
+            LOCAL_VERSION=$(grep -oP '^version = "\K[^"]*' spider-pipeline/Cargo.toml)
             
-            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
-              echo "spider-pipeline version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+            # Get the version from crates.io
+            if curl -s https://crates.io/api/v1/crates/spider-pipeline | python3 -c "import sys, json; print(json.load(sys.stdin)['crate']['max_version'] if 'crate' in json.load(sys.stdin) else '0.0.0')" 2>/dev/null; then
+              CRATES_IO_VERSION=$(curl -s https://crates.io/api/v1/crates/spider-pipeline | python3 -c "import sys, json; print(json.load(sys.stdin)['crate']['max_version'])" 2>/dev/null || echo "0.0.0")
+            else
+              CRATES_IO_VERSION="0.0.0"
+            fi
+            
+            if [ "$LOCAL_VERSION" != "$CRATES_IO_VERSION" ]; then
+              echo "spider-pipeline version differs from crates.io: local=$LOCAL_VERSION, crates.io=$CRATES_IO_VERSION"
               echo "changed=true" >> $GITHUB_OUTPUT
             else
-              echo "spider-pipeline version did not change"
+              echo "spider-pipeline version matches crates.io: $LOCAL_VERSION"
               echo "changed=false" >> $GITHUB_OUTPUT
             fi
           else
@@ -118,14 +152,20 @@ jobs:
         id: middleware_check
         run: |
           if [ -f "spider-middleware/Cargo.toml" ]; then
-            CURRENT_VERSION=$(grep -oP '^version = "\K[^"]*' spider-middleware/Cargo.toml)
-            PREVIOUS_VERSION=$(git show HEAD~1:spider-middleware/Cargo.toml | grep -oP '^version = "\K[^"]*')
+            LOCAL_VERSION=$(grep -oP '^version = "\K[^"]*' spider-middleware/Cargo.toml)
             
-            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
-              echo "spider-middleware version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+            # Get the version from crates.io
+            if curl -s https://crates.io/api/v1/crates/spider-middleware | python3 -c "import sys, json; print(json.load(sys.stdin)['crate']['max_version'] if 'crate' in json.load(sys.stdin) else '0.0.0')" 2>/dev/null; then
+              CRATES_IO_VERSION=$(curl -s https://crates.io/api/v1/crates/spider-middleware | python3 -c "import sys, json; print(json.load(sys.stdin)['crate']['max_version'])" 2>/dev/null || echo "0.0.0")
+            else
+              CRATES_IO_VERSION="0.0.0"
+            fi
+            
+            if [ "$LOCAL_VERSION" != "$CRATES_IO_VERSION" ]; then
+              echo "spider-middleware version differs from crates.io: local=$LOCAL_VERSION, crates.io=$CRATES_IO_VERSION"
               echo "changed=true" >> $GITHUB_OUTPUT
             else
-              echo "spider-middleware version did not change"
+              echo "spider-middleware version matches crates.io: $LOCAL_VERSION"
               echo "changed=false" >> $GITHUB_OUTPUT
             fi
           else
@@ -137,14 +177,20 @@ jobs:
         id: core_check
         run: |
           if [ -f "spider-core/Cargo.toml" ]; then
-            CURRENT_VERSION=$(grep -oP '^version = "\K[^"]*' spider-core/Cargo.toml)
-            PREVIOUS_VERSION=$(git show HEAD~1:spider-core/Cargo.toml | grep -oP '^version = "\K[^"]*')
+            LOCAL_VERSION=$(grep -oP '^version = "\K[^"]*' spider-core/Cargo.toml)
             
-            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
-              echo "spider-core version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+            # Get the version from crates.io
+            if curl -s https://crates.io/api/v1/crates/spider-core | python3 -c "import sys, json; print(json.load(sys.stdin)['crate']['max_version'] if 'crate' in json.load(sys.stdin) else '0.0.0')" 2>/dev/null; then
+              CRATES_IO_VERSION=$(curl -s https://crates.io/api/v1/crates/spider-core | python3 -c "import sys, json; print(json.load(sys.stdin)['crate']['max_version'])" 2>/dev/null || echo "0.0.0")
+            else
+              CRATES_IO_VERSION="0.0.0"
+            fi
+            
+            if [ "$LOCAL_VERSION" != "$CRATES_IO_VERSION" ]; then
+              echo "spider-core version differs from crates.io: local=$LOCAL_VERSION, crates.io=$CRATES_IO_VERSION"
               echo "changed=true" >> $GITHUB_OUTPUT
             else
-              echo "spider-core version did not change"
+              echo "spider-core version matches crates.io: $LOCAL_VERSION"
               echo "changed=false" >> $GITHUB_OUTPUT
             fi
           else
@@ -196,8 +242,7 @@ jobs:
           # Publish spider-util if its version changed
           if [ "${{ needs.check-version-changes.outputs.util_version_changed }}" == "true" ]; then
             echo "Publishing spider-util..."
-            cd spider-util && cargo publish --all-features && cd ..
-            sleep 30  # Wait for the registry to update
+            cd spider-util && cargo publish --all-features --allow-dirty && cd ..
           else
             echo "Skipping spider-util - no version change"
           fi
@@ -205,8 +250,7 @@ jobs:
           # Publish spider-macro if its version changed
           if [ "${{ needs.check-version-changes.outputs.macro_version_changed }}" == "true" ]; then
             echo "Publishing spider-macro..."
-            cd spider-macro && cargo publish --all-features && cd ..
-            sleep 30  # Wait for the registry to update
+            cd spider-macro && cargo publish --all-features --allow-dirty && cd ..
           else
             echo "Skipping spider-macro - no version change"
           fi
@@ -214,8 +258,7 @@ jobs:
           # Publish spider-downloader if its version changed
           if [ "${{ needs.check-version-changes.outputs.downloader_version_changed }}" == "true" ]; then
             echo "Publishing spider-downloader..."
-            cd spider-downloader && cargo publish --all-features && cd ..
-            sleep 30  # Wait for the registry to update
+            cd spider-downloader && cargo publish --all-features --allow-dirty && cd ..
           else
             echo "Skipping spider-downloader - no version change"
           fi
@@ -223,8 +266,7 @@ jobs:
           # Publish spider-pipeline if its version changed
           if [ "${{ needs.check-version-changes.outputs.pipeline_version_changed }}" == "true" ]; then
             echo "Publishing spider-pipeline..."
-            cd spider-pipeline && cargo publish --all-features && cd ..
-            sleep 30  # Wait for the registry to update
+            cd spider-pipeline && cargo publish --all-features --allow-dirty && cd ..
           else
             echo "Skipping spider-pipeline - no version change"
           fi
@@ -232,8 +274,7 @@ jobs:
           # Publish spider-middleware if its version changed
           if [ "${{ needs.check-version-changes.outputs.middleware_version_changed }}" == "true" ]; then
             echo "Publishing spider-middleware..."
-            cd spider-middleware && cargo publish --all-features && cd ..
-            sleep 30  # Wait for the registry to update
+            cd spider-middleware && cargo publish --all-features --allow-dirty && cd ..
           else
             echo "Skipping spider-middleware - no version change"
           fi
@@ -241,8 +282,7 @@ jobs:
           # Publish spider-core if its version changed
           if [ "${{ needs.check-version-changes.outputs.core_version_changed }}" == "true" ]; then
             echo "Publishing spider-core..."
-            cd spider-core && cargo publish --all-features && cd ..
-            sleep 30  # Wait for the registry to update
+            cd spider-core && cargo publish --all-features --allow-dirty && cd ..
           else
             echo "Skipping spider-core - no version change"
           fi
@@ -250,7 +290,7 @@ jobs:
           # Finally publish the main crate if its version changed
           if [ "${{ needs.check-version-changes.outputs.main_version_changed }}" == "true" ]; then
             echo "Publishing main spider-lib crate..."
-            cargo publish --all-features
+            cargo publish --all-features --allow-dirty
           else
             echo "Skipping main crate - no version change"
           fi
