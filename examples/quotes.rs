@@ -55,7 +55,9 @@ async fn main() -> Result<(), SpiderError> {
     // The builder defaults to using ReqwestClientDownloader
     let crawler = CrawlerBuilder::new(QuotesSpider).build().await?;
 
+    let stats = crawler.get_stats();
     crawler.start_crawl().await?;
+    println!("{}", stats);
 
     Ok(())
 }

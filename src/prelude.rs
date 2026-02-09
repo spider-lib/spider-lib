@@ -27,7 +27,10 @@ pub use spider_core::{
 };
 
 // Re-export ParseOutput and ScrapedItem from spider_util
-pub use spider_util::item::{ParseOutput, ScrapedItem};
+pub use spider_util::{
+    item::{ParseOutput, ScrapedItem},
+    streaming_response::StreamingResponse,
+};
 
 // Re-export Pipeline from spider_pipeline
 pub use spider_pipeline::pipeline::Pipeline;
@@ -39,8 +42,7 @@ pub use spider_util::{
     error::{PipelineError, SpiderError},
     request::Request,
     response::Response,
-    serde, serde_json,
-    utils::{is_same_site, normalize_origin, validate_output_dir, create_dir, ToSelector},
+    utils::{ToSelector, create_dir, is_same_site, normalize_origin, validate_output_dir},
 };
 
 pub use spider_middleware::{
@@ -63,8 +65,7 @@ pub use spider_middleware::robots_txt::RobotsTxtMiddleware;
 pub use spider_middleware::cookies::CookieMiddleware;
 
 pub use spider_pipeline::{
-    console_writer::ConsoleWriterPipeline,
-    deduplication::DeduplicationPipeline,
+    console_writer::ConsoleWriterPipeline, deduplication::DeduplicationPipeline,
 };
 
 #[cfg(feature = "pipeline-csv")]

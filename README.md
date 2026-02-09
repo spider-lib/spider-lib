@@ -77,10 +77,12 @@ Spider-lib provides optional features for specific functionality:
 #### Core Features
 - `checkpoint` - Enable checkpoint and resume functionality
 - `cookie-store` - Enable advanced cookie store integration (Note: When using `middleware-cookies`, `cookie-store` should also be enabled)
+- `streaming` - Enable streaming response processing for memory-efficient handling of large responses
 
 #### Important Feature Relationships
 - `middleware-cookies` and `cookie-store` are interdependent: When using `middleware-cookies`, `cookie-store` should also be enabled for full functionality
 - When using `cookie-store`, `middleware-cookies` functionality may be desired for managing cookies effectively
+- `streaming` feature enables memory-efficient processing of large responses without loading entire body into memory
 
 By default, only core functionality is included. You can enable specific features as needed:
 
@@ -142,6 +144,54 @@ We welcome contributions to the spider-lib project! Please see our [CONTRIBUTING
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Streaming Response Feature
+
+The `streaming` feature enables memory-efficient processing of large responses without loading the entire body into memory at once. This is particularly useful when scraping large web pages or when memory usage is a concern.
+
+To use the streaming feature:
+
+```toml
+[dependencies]
+spider-lib = { version = "1.1.1", features = ["streaming"] }
+```
+
+With the streaming feature enabled, you can implement both `parse` and `parse_streaming` methods in your spider:
+
+```rust
+use spider_lib::prelude::*;
+
+#[scraped_item]
+struct MyItem {
+    content: String,
+}
+
+struct MySpider;
+
+#[async_trait]
+impl Spider for MySpider {
+    type Item = MyItem;
+
+    fn start_urls(&self) -> Vec<&'static str> {
+        vec!["https://example.com/large-page"]
+    }
+
+    async fn parse(&mut self, response: Response) -> Result<ParseOutput<Self::Item>, SpiderError> {
+        // Traditional parsing - entire response body loaded into memory
+        // ... parsing logic ...
+        todo!()
+    }
+
+    #[cfg(feature = "streaming")]
+    async fn parse_streaming(&mut self, response: StreamingResponse) -> Result<ParseOutput<Self::Item>, SpiderError> {
+        // Streaming parsing - processes response without loading entire body
+        // ... streaming parsing logic ...
+        todo!()
+    }
+}
+```
+
+The framework will automatically use the appropriate method based on the response type and feature configuration.
 
 ## Documentation
 
