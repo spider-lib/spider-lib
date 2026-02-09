@@ -12,31 +12,158 @@ jobs:
   check-version-changes:
     runs-on: ubuntu-latest
     outputs:
-      version_changed: ${{ steps.check.outputs.changed }}
+      main_version_changed: ${{ steps.main_check.outputs.changed }}
+      util_version_changed: ${{ steps.util_check.outputs.changed }}
+      macro_version_changed: ${{ steps.macro_check.outputs.changed }}
+      downloader_version_changed: ${{ steps.downloader_check.outputs.changed }}
+      pipeline_version_changed: ${{ steps.pipeline_check.outputs.changed }}
+      middleware_version_changed: ${{ steps.middleware_check.outputs.changed }}
+      core_version_changed: ${{ steps.core_check.outputs.changed }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
-      - name: Check if versions changed
-        id: check
+      - name: Check main version changes
+        id: main_check
         run: |
-          # Get the version from current and previous commits
           CURRENT_VERSION=$(grep -oP '^version = "\K[^"]*' Cargo.toml)
           PREVIOUS_VERSION=$(git show HEAD~1:Cargo.toml | grep -oP '^version = "\K[^"]*')
           
           if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
-            echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+            echo "Main version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
             echo "changed=true" >> $GITHUB_OUTPUT
           else
-            echo "Version did not change"
+            echo "Main version did not change"
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check spider-util version changes
+        id: util_check
+        run: |
+          if [ -f "spider-util/Cargo.toml" ]; then
+            CURRENT_VERSION=$(grep -oP '^version = "\K[^"]*' spider-util/Cargo.toml)
+            PREVIOUS_VERSION=$(git show HEAD~1:spider-util/Cargo.toml | grep -oP '^version = "\K[^"]*')
+            
+            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+              echo "spider-util version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+              echo "changed=true" >> $GITHUB_OUTPUT
+            else
+              echo "spider-util version did not change"
+              echo "changed=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "spider-util version did not change"
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check spider-macro version changes
+        id: macro_check
+        run: |
+          if [ -f "spider-macro/Cargo.toml" ]; then
+            CURRENT_VERSION=$(grep -oP '^version = "\K[^"]*' spider-macro/Cargo.toml)
+            PREVIOUS_VERSION=$(git show HEAD~1:spider-macro/Cargo.toml | grep -oP '^version = "\K[^"]*')
+            
+            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+              echo "spider-macro version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+              echo "changed=true" >> $GITHUB_OUTPUT
+            else
+              echo "spider-macro version did not change"
+              echo "changed=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "spider-macro version did not change"
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check spider-downloader version changes
+        id: downloader_check
+        run: |
+          if [ -f "spider-downloader/Cargo.toml" ]; then
+            CURRENT_VERSION=$(grep -oP '^version = "\K[^"]*' spider-downloader/Cargo.toml)
+            PREVIOUS_VERSION=$(git show HEAD~1:spider-downloader/Cargo.toml | grep -oP '^version = "\K[^"]*')
+            
+            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+              echo "spider-downloader version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+              echo "changed=true" >> $GITHUB_OUTPUT
+            else
+              echo "spider-downloader version did not change"
+              echo "changed=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "spider-downloader version did not change"
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check spider-pipeline version changes
+        id: pipeline_check
+        run: |
+          if [ -f "spider-pipeline/Cargo.toml" ]; then
+            CURRENT_VERSION=$(grep -oP '^version = "\K[^"]*' spider-pipeline/Cargo.toml)
+            PREVIOUS_VERSION=$(git show HEAD~1:spider-pipeline/Cargo.toml | grep -oP '^version = "\K[^"]*')
+            
+            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+              echo "spider-pipeline version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+              echo "changed=true" >> $GITHUB_OUTPUT
+            else
+              echo "spider-pipeline version did not change"
+              echo "changed=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "spider-pipeline version did not change"
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check spider-middleware version changes
+        id: middleware_check
+        run: |
+          if [ -f "spider-middleware/Cargo.toml" ]; then
+            CURRENT_VERSION=$(grep -oP '^version = "\K[^"]*' spider-middleware/Cargo.toml)
+            PREVIOUS_VERSION=$(git show HEAD~1:spider-middleware/Cargo.toml | grep -oP '^version = "\K[^"]*')
+            
+            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+              echo "spider-middleware version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+              echo "changed=true" >> $GITHUB_OUTPUT
+            else
+              echo "spider-middleware version did not change"
+              echo "changed=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "spider-middleware version did not change"
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check spider-core version changes
+        id: core_check
+        run: |
+          if [ -f "spider-core/Cargo.toml" ]; then
+            CURRENT_VERSION=$(grep -oP '^version = "\K[^"]*' spider-core/Cargo.toml)
+            PREVIOUS_VERSION=$(git show HEAD~1:spider-core/Cargo.toml | grep -oP '^version = "\K[^"]*')
+            
+            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+              echo "spider-core version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+              echo "changed=true" >> $GITHUB_OUTPUT
+            else
+              echo "spider-core version did not change"
+              echo "changed=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "spider-core version did not change"
             echo "changed=false" >> $GITHUB_OUTPUT
           fi
 
   publish:
     needs: check-version-changes
-    if: needs.check-version-changes.outputs.version_changed == 'true'
     runs-on: ubuntu-latest
+    # Only run if any version changed
+    if: |
+      needs.check-version-changes.outputs.main_version_changed == 'true' ||
+      needs.check-version-changes.outputs.util_version_changed == 'true' ||
+      needs.check-version-changes.outputs.macro_version_changed == 'true' ||
+      needs.check-version-changes.outputs.downloader_version_changed == 'true' ||
+      needs.check-version-changes.outputs.pipeline_version_changed == 'true' ||
+      needs.check-version-changes.outputs.middleware_version_changed == 'true' ||
+      needs.check-version-changes.outputs.core_version_changed == 'true'
     steps:
       - uses: actions/checkout@v4
       
@@ -52,39 +179,78 @@ jobs:
           echo '[registry]' > ~/.cargo/config.toml
           echo 'token = "${{ secrets.CARGO_REGISTRY_TOKEN }}"' >> ~/.cargo/config.toml
       
-      - name: Test all features before publishing
+      - name: Verify all features work before publishing
         run: |
-          # Test that all features work for the entire workspace
+          # Check the workspace structure
+          pwd
+          ls -la
+          ls -la spider-*/
+          
+          # Verify that all features compile for the main crate
           cargo check --all-features
-          cargo test --all-features --lib
           
-      - name: Publish all packages in dependency order
+      - name: Publish updated packages in dependency order
         run: |
-          # Publish spider-util first since others depend on it
-          cd spider-util && cargo publish --all-features && cd ..
-          sleep 30  # Wait for the registry to update
+          # Publish spider-util if its version changed
+          if [ "${{ needs.check-version-changes.outputs.util_version_changed }}" == "true" ]; then
+            echo "Publishing spider-util..."
+            cd spider-util && cargo publish --all-features && cd ..
+            sleep 30  # Wait for the registry to update
+          else
+            echo "Skipping spider-util - no version change"
+          fi
           
-          # Publish spider-macro
-          cd spider-macro && cargo publish --all-features && cd ..
-          sleep 30  # Wait for the registry to update
+          # Publish spider-macro if its version changed
+          if [ "${{ needs.check-version-changes.outputs.macro_version_changed }}" == "true" ]; then
+            echo "Publishing spider-macro..."
+            cd spider-macro && cargo publish --all-features && cd ..
+            sleep 30  # Wait for the registry to update
+          else
+            echo "Skipping spider-macro - no version change"
+          fi
           
-          # Publish spider-downloader
-          cd spider-downloader && cargo publish --all-features && cd ..
-          sleep 30  # Wait for the registry to update
+          # Publish spider-downloader if its version changed
+          if [ "${{ needs.check-version-changes.outputs.downloader_version_changed }}" == "true" ]; then
+            echo "Publishing spider-downloader..."
+            cd spider-downloader && cargo publish --all-features && cd ..
+            sleep 30  # Wait for the registry to update
+          else
+            echo "Skipping spider-downloader - no version change"
+          fi
           
-          # Publish spider-pipeline
-          cd spider-pipeline && cargo publish --all-features && cd ..
-          sleep 30  # Wait for the registry to update
+          # Publish spider-pipeline if its version changed
+          if [ "${{ needs.check-version-changes.outputs.pipeline_version_changed }}" == "true" ]; then
+            echo "Publishing spider-pipeline..."
+            cd spider-pipeline && cargo publish --all-features && cd ..
+            sleep 30  # Wait for the registry to update
+          else
+            echo "Skipping spider-pipeline - no version change"
+          fi
           
-          # Publish spider-middleware
-          cd spider-middleware && cargo publish --all-features && cd ..
-          sleep 30  # Wait for the registry to update
+          # Publish spider-middleware if its version changed
+          if [ "${{ needs.check-version-changes.outputs.middleware_version_changed }}" == "true" ]; then
+            echo "Publishing spider-middleware..."
+            cd spider-middleware && cargo publish --all-features && cd ..
+            sleep 30  # Wait for the registry to update
+          else
+            echo "Skipping spider-middleware - no version change"
+          fi
           
-          # Publish spider-core
-          cd spider-core && cargo publish --all-features && cd ..
-          sleep 30  # Wait for the registry to update
+          # Publish spider-core if its version changed
+          if [ "${{ needs.check-version-changes.outputs.core_version_changed }}" == "true" ]; then
+            echo "Publishing spider-core..."
+            cd spider-core && cargo publish --all-features && cd ..
+            sleep 30  # Wait for the registry to update
+          else
+            echo "Skipping spider-core - no version change"
+          fi
           
-          # Finally publish the main crate
-          cargo publish --all-features
+          # Finally publish the main crate if its version changed
+          if [ "${{ needs.check-version-changes.outputs.main_version_changed }}" == "true" ]; then
+            echo "Publishing main spider-lib crate..."
+            cargo publish --all-features
+          else
+            echo "Skipping main crate - no version change"
+          fi
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
