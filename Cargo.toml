@@ -29,8 +29,8 @@ serde_json = "1.0.149"
 spider-util = { version = "0.1.7", path = "spider-util" }
 spider-macro = { version = "0.1.5", path = "spider-macro" }
 spider-middleware = { version = "0.1.7", path = "spider-middleware", features = ["core"] }
-spider-core = { version = "0.2.0", path = "spider-core" }
-spider-pipeline = { version = "0.1.6", path = "spider-pipeline" }
+spider-core = { version = "0.2.1", path = "spider-core" }
+spider-pipeline = { version = "0.1.7", path = "spider-pipeline" }
 spider-downloader = { version = "0.2.0", path = "spider-downloader" }
 
 [features]
