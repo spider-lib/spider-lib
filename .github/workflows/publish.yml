@@ -1,0 +1,90 @@
+name: Publish to Crates.io
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Cargo.toml'
+      - 'spider-*/Cargo.toml'
+
+jobs:
+  check-version-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      version_changed: ${{ steps.check.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check if versions changed
+        id: check
+        run: |
+          # Get the version from current and previous commits
+          CURRENT_VERSION=$(grep -oP '^version = "\K[^"]*' Cargo.toml)
+          PREVIOUS_VERSION=$(git show HEAD~1:Cargo.toml | grep -oP '^version = "\K[^"]*')
+          
+          if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+            echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "Version did not change"
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+  publish:
+    needs: check-version-changes
+    if: needs.check-version-changes.outputs.version_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Install cargo-workspaces
+        run: cargo install cargo-workspaces
+      
+      - name: Set up cargo credentials
+        run: |
+          mkdir -p ~/.cargo
+          echo '[registry]' > ~/.cargo/config.toml
+          echo 'token = "${{ secrets.CARGO_REGISTRY_TOKEN }}"' >> ~/.cargo/config.toml
+      
+      - name: Test all features before publishing
+        run: |
+          # Test that all features work for the entire workspace
+          cargo check --all-features
+          cargo test --all-features --lib
+          
+      - name: Publish all packages in dependency order
+        run: |
+          # Publish spider-util first since others depend on it
+          cd spider-util && cargo publish --all-features && cd ..
+          sleep 30  # Wait for the registry to update
+          
+          # Publish spider-macro
+          cd spider-macro && cargo publish --all-features && cd ..
+          sleep 30  # Wait for the registry to update
+          
+          # Publish spider-downloader
+          cd spider-downloader && cargo publish --all-features && cd ..
+          sleep 30  # Wait for the registry to update
+          
+          # Publish spider-pipeline
+          cd spider-pipeline && cargo publish --all-features && cd ..
+          sleep 30  # Wait for the registry to update
+          
+          # Publish spider-middleware
+          cd spider-middleware && cargo publish --all-features && cd ..
+          sleep 30  # Wait for the registry to update
+          
+          # Publish spider-core
+          cd spider-core && cargo publish --all-features && cd ..
+          sleep 30  # Wait for the registry to update
+          
+          # Finally publish the main crate
+          cargo publish --all-features
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
