@@ -166,6 +166,8 @@ jobs:
       needs.check-version-changes.outputs.core_version_changed == 'true'
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
