@@ -2294,7 +2294,7 @@ dependencies = [
 
 [[package]]
 name = "spider-core"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2310,7 +2310,7 @@ dependencies = [
  "serde",
  "serde_json",
  "spider-downloader",
- "spider-macro 0.1.3",
+ "spider-macro",
  "spider-middleware",
  "spider-pipeline",
  "spider-util",
@@ -2334,28 +2334,17 @@ dependencies = [
 
 [[package]]
 name = "spider-lib"
-version = "1.1.2"
+version = "1.1.3"
 dependencies = [
  "serde",
  "serde_json",
  "spider-core",
  "spider-downloader",
- "spider-macro 0.1.4",
+ "spider-macro",
  "spider-middleware",
  "spider-pipeline",
  "spider-util",
  "tracing-subscriber",
-]
-
-[[package]]
-name = "spider-macro"
-version = "0.1.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f6076225efbab33802311923604fef24d52236e102bbd25a9a912050b93e4b7"
-dependencies = [
- "quote",
- "serde",
- "syn",
 ]
 
 [[package]]
@@ -2421,8 +2410,11 @@ dependencies = [
  "bytes",
  "csv",
  "dashmap 6.1.0",
+ "futures-util",
  "http",
  "linkify",
+ "once_cell",
+ "parking_lot 0.12.5",
  "psl",
  "reqwest",
  "rusqlite",
