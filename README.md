@@ -77,12 +77,10 @@ Spider-lib provides optional features for specific functionality:
 #### Core Features
 - `checkpoint` - Enable checkpoint and resume functionality
 - `cookie-store` - Enable advanced cookie store integration (Note: When using `middleware-cookies`, `cookie-store` should also be enabled)
-- `stream` - Enable stream response processing for memory-efficient handling of large responses
 
 #### Important Feature Relationships
 - `middleware-cookies` and `cookie-store` are interdependent: When using `middleware-cookies`, `cookie-store` should also be enabled for full functionality
 - When using `cookie-store`, `middleware-cookies` functionality may be desired for managing cookies effectively
-- `stream` feature enables memory-efficient processing of large responses without loading entire body into memory
 
 By default, only core functionality is included. You can enable specific features as needed:
 
@@ -104,9 +102,29 @@ Here's a basic example of how to use the framework:
 
 ```rust
 use spider_lib::prelude::*;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use dashmap::DashMap;
 
 #[derive(Default)]
 struct MySpider;
+
+// State untuk tracking informasi selama crawling
+#[derive(Clone, Default)]
+struct MySpiderState {
+    page_count: Arc<AtomicUsize>,
+    visited_urls: Arc<DashMap<String, bool>>,
+}
+
+impl MySpiderState {
+    fn increment_page_count(&self) {
+        self.page_count.fetch_add(1, Ordering::SeqCst);
+    }
+    
+    fn mark_url_visited(&self, url: String) {
+        self.visited_urls.insert(url, true);
+    }
+}
 
 #[scraped_item]
 struct MyItem {
@@ -117,12 +135,17 @@ struct MyItem {
 #[async_trait]
 impl Spider for MySpider {
     type Item = MyItem;
+    type State = MySpiderState;
 
     fn start_urls(&self) -> Vec<&'static str> {
         vec!["https://example.com"]
     }
 
-    async fn parse(&mut self, response: Response) -> Result<ParseOutput<Self::Item>, SpiderError> {
+    async fn parse(&self, response: Response, state: &Self::State) -> Result<ParseOutput<Self::Item>, SpiderError> {
+        // Update state - bisa dilakukan secara concurrent tanpa blocking spider
+        state.increment_page_count();
+        state.mark_url_visited(response.url.to_string());
+        
         // Custom parsing logic here
         todo!()
     }
@@ -135,6 +158,10 @@ async fn main() -> Result<(), SpiderError> {
 }
 ```
 
+**Note**: Perhatikan bahwa implementasi `Spider` sekarang menggunakan referensi immutable (`&self`) 
+dan menerima parameter state terpisah (`state: &Self::State`). Ini memungkinkan concurrent crawling 
+yang lebih efisien karena menghilangkan kebutuhan akan mutex pada spider itu sendiri.
+
 **Important**: Make sure to import the prelude with `use spider_lib::prelude::*;` to bring the necessary items into scope for the macro to work properly.
 
 ## Contributing
@@ -145,53 +172,6 @@ We welcome contributions to the spider-lib project! Please see our [CONTRIBUTING
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Stream Response Feature
-
-The `stream` feature enables memory-efficient processing of large responses without loading the entire body into memory at once. This is particularly useful when scraping large web pages or when memory usage is a concern.
-
-To use the stream feature:
-
-```toml
-[dependencies]
-spider-lib = { version = "1.2.0", features = ["stream"] }
-```
-
-With the stream feature enabled, you can implement both `parse` and `parse_stream` methods in your spider:
-
-```rust
-use spider_lib::prelude::*;
-
-#[scraped_item]
-struct MyItem {
-    content: String,
-}
-
-struct MySpider;
-
-#[async_trait]
-impl Spider for MySpider {
-    type Item = MyItem;
-
-    fn start_urls(&self) -> Vec<&'static str> {
-        vec!["https://example.com/large-page"]
-    }
-
-    async fn parse(&mut self, response: Response) -> Result<ParseOutput<Self::Item>, SpiderError> {
-        // Traditional parsing - entire response body loaded into memory
-        // ... parsing logic ...
-        todo!()
-    }
-
-    #[cfg(feature = "stream")]
-    async fn parse_stream(&mut self, response: StreamResponse) -> Result<ParseOutput<Self::Item>, SpiderError> {
-        // Stream parsing - processes response without loading entire body
-        // ... stream parsing logic ...
-        todo!()
-    }
-}
-```
-
-The framework will automatically use the appropriate method based on the response type and feature configuration.
 
 ## Documentation
 
