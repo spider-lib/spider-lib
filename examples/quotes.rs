@@ -1,5 +1,8 @@
 // Use the prelude for easy access to common types and traits.
 use spider_lib::prelude::*;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use dashmap::DashMap;
 
 #[scraped_item]
 pub struct QuoteItem {
@@ -7,17 +10,43 @@ pub struct QuoteItem {
     pub author: String,
 }
 
+// State untuk tracking jumlah halaman yang telah diproses
+#[derive(Clone, Default)]
+pub struct QuotesSpiderState {
+    page_count: Arc<AtomicUsize>,
+    visited_urls: Arc<DashMap<String, bool>>,
+}
+
+impl QuotesSpiderState {
+    pub fn increment_page_count(&self) {
+        self.page_count.fetch_add(1, Ordering::SeqCst);
+    }
+    
+    pub fn get_page_count(&self) -> usize {
+        self.page_count.load(Ordering::SeqCst)
+    }
+    
+    pub fn mark_url_visited(&self, url: String) {
+        self.visited_urls.insert(url, true);
+    }
+}
+
 pub struct QuotesSpider;
 
 #[async_trait]
 impl Spider for QuotesSpider {
     type Item = QuoteItem;
+    type State = QuotesSpiderState;
 
     fn start_urls(&self) -> Vec<&'static str> {
         vec!["https://quotes.toscrape.com/"]
     }
 
-    async fn parse(&mut self, response: Response) -> Result<ParseOutput<Self::Item>, SpiderError> {
+    async fn parse(&self, response: Response, state: &Self::State) -> Result<ParseOutput<Self::Item>, SpiderError> {
+        // Update state - bisa dilakukan secara concurrent tanpa blocking spider
+        state.increment_page_count();
+        state.mark_url_visited(response.url.to_string());
+        
         let html = response.to_html()?;
         let mut output = ParseOutput::new();
 
@@ -50,14 +79,13 @@ impl Spider for QuotesSpider {
 
 #[tokio::main]
 async fn main() -> Result<(), SpiderError> {
-    tracing_subscriber::fmt().with_env_filter("info").init();
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("spider_lib=info,spider_core=info,spider_downloader=info,spider_middleware=info,spider_pipeline=info,spider_util=info"))
+        .init();
 
     // The builder defaults to using ReqwestClientDownloader
     let crawler = CrawlerBuilder::new(QuotesSpider).build().await?;
 
-    let stats = crawler.get_stats();
     crawler.start_crawl().await?;
-    println!("{}", stats);
 
     Ok(())
 }
